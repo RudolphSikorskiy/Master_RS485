@@ -3,6 +3,7 @@
 char MyADDR[] = "60";
 unsigned int AddrLen = sizeof(MyADDR)-1;
 
+
 static FILE mystdout = FDEV_SETUP_STREAM(uart_putchar, NULL, _FDEV_SETUP_WRITE);
 
  void USARTinit(void)
@@ -44,6 +45,7 @@ ISR(USART_RXC_vect)
 		char bf= UDR;
         buffer[IDX]=bf;
         IDX++;
+		
 		if (bf == '*' || IDX >= LEN)
         {
 				buffer[IDX-1]='\0';
@@ -52,6 +54,7 @@ ISR(USART_RXC_vect)
 				SOFT_UART_send(buffer);
 				SOFT_UART_send("\r\n");
 				buffer[0] = '\0';
+				
 				//printf("%s",buffer);
 				//Response485();
 				
