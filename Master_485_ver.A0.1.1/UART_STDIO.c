@@ -51,8 +51,26 @@ ISR(USART_RXC_vect)
 				buffer[IDX-1]='\0';
                 IDX=0;
                 done=1;
-				SOFT_UART_send(buffer);
-				SOFT_UART_send("\r\n");
+				//SOFT_UART_send(buffer);
+				//SOFT_UART_send("\r\n");
+				
+				switch (buffer[1])
+				{
+					case 0x10:	//SOFT_UART_send(buffer);
+								for (int i =2;buffer[i]!='\0';i++)
+								{
+									SOFT_UART_byte(buffer[i]);
+								}
+								SOFT_UART_send("\t");
+						break;
+					case 0x11:	MasAddr[MasAddrCursor] = buffer[0]; 
+								MasAddrCursor++;
+						break;
+					case 0x12:	
+						break;
+					default:	SOFT_UART_send("comand not found*");
+						break;
+				}
 				buffer[0] = '\0';
 				
 				//printf("%s",buffer);

@@ -13,6 +13,12 @@
  
 #include "SoftUART.h"
 #include "UART_STDIO.h"
+#include "twi.h"
+#include "RTC.h"
+#define SUMSLAVE 10
+uint8_t MasAddr[SUMSLAVE];
+unsigned int MasAddrCursor;
+unsigned int err;
 
 
 

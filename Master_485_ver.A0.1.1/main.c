@@ -1,8 +1,8 @@
 
 #include "main.h"
 
-uint8_t Slaveadd = 0x68;
 uint8_t cmd[10] = {0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18};
+	
 
 //-----------------------------------------------------------------------//
 /*
@@ -10,25 +10,51 @@ uint8_t cmd[10] = {0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18};
 	PORTD &= ~(1<<(PORTD4));	// Прием
 */
 //-----------------------------------------------------------------------//
-int main(void)
+void Inicialization(void)
 {
-	DDRD = 0xFF;				// порты на выход
-	PORTD |= (1<<(PORTD4));		// Передача
-	USARTinit(); //207 -> 9600 для 16Mhz 51 -> 19600 для 16Mhz
-	sei();
-	while (1)
+	SOFT_UART_send("Inicialization...");
+	for (char i = 0x31;i < 0xFF;i++)
 	{
 		PORTD |= (1<<(PORTD4));							// Передача
 		_delay_ms(1);
-		printf("%c%c*",Slaveadd,cmd[0]);				// Тут должен выбираться адрес слейва и команда
+		printf("%c%c*",i,cmd[1]);						// Сканирование адресного пространства 0х31-0хFF Командой возврата адреса
 		_delay_ms(1);
 		PORTD &= ~(1<<(PORTD4));						// Прием
-		_delay_ms(1000);								// Вместо задержки цикл с таймером на 3 попытки
+		_delay_ms(10);									// задержка для записи адреса в массив
+	}
+	SOFT_UART_send("Ok!\r\n");
+	//SOFT_UART_send(MasAddr);							// Отладка проверяем сколько адресов и каких записалось в массив
+	//SOFT_UART_send("\r\n");
+	_delay_ms(2000);
+}
+
+
+int main(void)
+{
+	I2C_Init();
+	DDRD = 0xFF;				// порты на выход
+	PORTD |= (1<<(PORTD4));		// Передача
+	USARTinit();				//207 -> 9600 для 16Mhz 51 -> 19600 для 16Mhz
+	sei();
+	MasAddrCursor = 0;			// Курсор для массива адресного пространства
+	Inicialization();
+	while (1)
+	{
+		GetTime();				// Получаем время с модуля убрать в таймер!
 		
-														// Дальнейшая обработка буфера
-									
-														// Вывод информации
-									
+		for (int i = 0;i < MasAddrCursor;i++)
+		{
+			PORTD |= (1<<(PORTD4));				// Передача
+			_delay_ms(1);
+			printf("%c%c*",MasAddr[i],cmd[0]);	// Опрос инициализированых слейвов команда запрос Данных
+			_delay_ms(1);
+			PORTD &= ~(1<<(PORTD4));			// Прием
+			_delay_ms(1000);						
+		}
+		SOFT_UART_send("\r\n");
+		//_delay_ms(500);
+			
+						
 		for (int i = 0;i<sizeof(buffer);i++) // очистка буфера
 		{
 			buffer[i]=0;

@@ -4,7 +4,7 @@
 uint8_t n=0;						// Курсор масива
 char instr[BufLEN];					// Буфер приема
 char BUF[BufLEN];
-
+uint8_t commandMaster;
 
 
 //--------------------------------------------------------------------------------------------//
@@ -18,6 +18,7 @@ ISR(INT0_vect)
 	{
 		uint8_t x = SOFT_UART_read();
 		instr[n] = x;
+		
 		//USART_Transmit(x);
 		//printf("%c",x);
 		//SOFT_UART_byte(x);
